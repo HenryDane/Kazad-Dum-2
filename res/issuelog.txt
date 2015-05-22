@@ -1,0 +1,27 @@
+=======================================
+KAZAD DUM ISSUES LOG
+=======================================
+# (-) indicates a bug, glitch, error, or something that needs to be fixed. 
+# (+) indicates something that is not a problem -- something to be added.
+
+--- Issues ---
+- FIX collisions: make collisions smoother.
++ ADD vases
++ ADD other lights
++ ADD ways to break crates
++ ADD crate & player collision support
+- FIX spawn point: prevent player and spawn marker from colliding with crates
+05/15/2015 FIXED cubes: add bottoms to them
+- FIX level optimization: remove excess areas, possible convert to one mesh and remove duplicates (HashSet & glBegin(GL_QUAD_STRIP); ?)
++ ADD 2 speed system: double tap the W key to sprint for a limited amount of time
++ ADD level counter
++ ADD center of screen + to see exactly what the camera is looking at
++ ADD glow to cube
++ ADD "rocks" to the floor to make areas more unique
++ POSSIBLY ADD enemies to fight with key combinations 
+- FIX variable speed when moving
+05/15/2015 FIXED crate spawning: crates should go horizontally before vertically
+05/15/2015 CANCELED FIX crate spawning further: crates should be flush with walls and should expand on BOTH the x and z axes not just on one of them -- adds to the idea that they were stacked
+- FIX cubes being placable inside each other
+05/15/2015 FIXED crates must be reset on new level
+05/15/2015 FIXED place spawn on level down point and goal of level up point or v.v so as to ensure the existence of both which is currently false
