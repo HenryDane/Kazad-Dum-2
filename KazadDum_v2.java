@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This is the main part of the game; the contructor is the main loop :/
+ * This was written with netbeans; the //<editor-fold . . . stuff is to compact the code. 
  */
 package kazad_dum_2;
 
@@ -37,11 +36,11 @@ import org.newdawn.slick.opengl.TextureLoader;
  */
 public class KazadDum_v2 {
 //    boolean closeFog = false;
-    int size = 32;
-    boolean strongFog = false;
-    boolean noFog = false;
-    boolean debug = false;
-    boolean noTextures = true;
+    int size = 32;              //size of the dungeon -- x and y
+    boolean strongFog = false;  //enable super dense fog
+    boolean noFog = false;      //disable fog
+    boolean debug = false;      //enable debug -- does nothing
+    boolean noTextures = true;  //disale textures -- runs way faster when this is true
 
     // <editor-fold defaultstate="collapsed" desc="Variable Definitions">
     BrownDungeonGenerator bdg2;
@@ -51,7 +50,7 @@ public class KazadDum_v2 {
     List<Placeable> crates;
     DisplayMode DISPLAYMODE;
     private static final FloatBuffer lightPosition = BufferTools.asFlippedFloatBuffer(5, 10, 6, 1);
-    private static FloatBuffer lightPosition2 = BufferTools.asFlippedFloatBuffer(5, 10, 6, 1);
+    private static FloatBuffer lightPosition2 = BufferTools.asFlippedFloatBuffer(5, 10, 6, 1); //unnecessary but handy to have around
     private static EulerCamera camera;
     float LOWSPEED = 1;
     float HIGHSPEED = 2;
@@ -59,6 +58,7 @@ public class KazadDum_v2 {
     boolean crdrs = false;
     float ylock = .5f;
     float YLOCKED = .5f;
+    // opengl display lists
     int dungeonDisplayList;
     int dungeonFloorList;
     int dungeonWallList;
@@ -197,6 +197,7 @@ public class KazadDum_v2 {
                 case Initalizing:
                     // <editor-fold defaultstate="collapsed" desc="TODO while loading">  
                     if (!loadingThread1.isAlive()) {
+                        //if the loading thread is dead, make all of the lists.
                         dungeonDisplayList = glGenLists(1);
                         dungeonFloorList = glGenLists(1);
                         dungeonWallList = glGenLists(1);
@@ -267,20 +268,21 @@ public class KazadDum_v2 {
                     break;
                 case Running:
                     // <editor-fold defaultstate="collapsed" desc="Colission Mark 1">  
+                    // a really nasty way to get collissions. Really needs some fixing
                     int tdx = (int) camera.x(); //get rid of decimal places
-                    int tdy = (int) camera.z();
-                    if (bdg2.getCell(tdx, tdy) != 0 && bdg2.getCell(tdx, tdy) != 1 && bdg2.getCell(tdx, tdy) != 3) {
+                    int tdy = (int) camera.z(); //get rid of decimal places
+                    if (bdg2.getCell(tdx, tdy) != 0 && bdg2.getCell(tdx, tdy) != 1 && bdg2.getCell(tdx, tdy) != 3) { //check if the cell of the map is safe
                         lSafePosition = new Vector3f(camera.x(), camera.y(), camera.z()); //if safe save location
-                    } else {
-                        Vector3f thisTileRepulsion = getRepulsion(new Vector3f(camera.x(), camera.y(), camera.z()), new Vector3f(tdx + .5f, 0, tdy + .5f), .01f);
-                        lSafePosition = new Vector3f(lSafePosition.x + thisTileRepulsion.x, lSafePosition.y + thisTileRepulsion.y, lSafePosition.z + thisTileRepulsion.z);
-                        camera.setPosition(lSafePosition.x, lSafePosition.y, lSafePosition.z);
-                        lSafePosition = new Vector3f(camera.x(), camera.y(), camera.z());
+                    } else { // if the cell isn't safe
+                        Vector3f thisTileRepulsion = getRepulsion(new Vector3f(camera.x(), camera.y(), camera.z()), new Vector3f(tdx + .5f, 0, tdy + .5f), .01f); //calculate the "repulsion" factor
+                        lSafePosition = new Vector3f(lSafePosition.x + thisTileRepulsion.x, lSafePosition.y + thisTileRepulsion.y, lSafePosition.z + thisTileRepulsion.z); //recalculate the last safe position
+                        camera.setPosition(lSafePosition.x, lSafePosition.y, lSafePosition.z); // move the camera to the last safe position
+                        lSafePosition = new Vector3f(camera.x(), camera.y(), camera.z()); // set the last safe position to the camera's position
                     }
 
                     //Next Level
                     if ((goal.x) < camera.x() && (goal.x + .4f) > camera.x()) {
-                        if ((goal.z) < camera.z() && (goal.z + .4f) > camera.z()) {
+                        if ((goal.z) < camera.z() && (goal.z + .4f) > camera.z()) { // is the camera in the level complete cube?
                             System.out.println("Camera @ X:" + camera.x() + " Y:" + camera.y() +" Z:" + camera.z());
                             System.out.println("Goal @ X:" + goal.x +" Y:" + goal.y + " Z:" + goal.z);
                             GAMESTATE = GameState.GeneratingLevel;
@@ -305,17 +307,19 @@ public class KazadDum_v2 {
                     for (Placeable p : crates) {
                             p.draw();
                     }
-
+                    
+                    // enable glowyness
                     glDepthMask(false);
                     glCullFace(GL_FRONT);
                     glEnable(GL_BLEND);
                     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
+                    // draw starting pos cube
                     glMaterial(GL_FRONT, GL_EMISSION, glowColorBlue);
                     glColor4f(0, 0, 1f, .6f);
                     drawCube(.3f, cameraSpawn.x, cameraSpawn.y + .5f - .2f, cameraSpawn.z);
-                    Pyramid py = new Pyramid(1f, cameraSpawn.x, cameraSpawn.y, cameraSpawn.z);
-                    py.draw();
+                    Pyramid py = new Pyramid(1f, cameraSpawn.x, cameraSpawn.y, cameraSpawn.z); 
+                    py.draw(); //doesn't work. Why? no one knows.
                     
                     glMaterial(GL_FRONT, GL_EMISSION, glowColorRed);
                     glColor4f(1f, 0, 0, .6f);
